@@ -82,6 +82,8 @@ public:
 
     bool isFinished();
 
+    bool mergeDetected();
+
     Viewer* mpViewer;
 
 #ifdef REGISTER_TIMES
