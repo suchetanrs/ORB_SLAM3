@@ -40,6 +40,9 @@
 #include "ImuTypes.h"
 #include "Settings.h"
 
+#ifdef WITH_TRAVERSABILITY_MAP
+#include "traversability_mapping/System.hpp"
+#endif
 
 namespace ORB_SLAM3
 {
@@ -190,6 +193,10 @@ public:
 
     LoopClosing* GetLoopClosing();
 
+#ifdef WITH_TRAVERSABILITY_MAP
+    traversability_mapping::System* getTraversability();
+#endif
+
 #ifdef REGISTER_TIMES
     void InsertRectTime(double& time);
     void InsertResizeTime(double& time);
@@ -200,6 +207,10 @@ private:
 
     void SaveAtlas(int type);
     bool LoadAtlas(int type);
+
+#ifdef WITH_TRAVERSABILITY_MAP
+    traversability_mapping::System* mpTraversability_;
+#endif
 
     string CalculateCheckSum(string filename, int type);
 

@@ -188,9 +188,15 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     //Initialize the Tracking thread
     //(it will live in the main thread of execution, the one that called this constructor)
     cout << "Seq. Name: " << strSequence << endl;
+#ifdef WITH_TRAVERSABILITY_MAP
+    mpTraversability_ = new traversability_mapping::System();
+    cout << "INIT TRAVERSABILITY COMPLETE" << endl;
     mpTracker = new Tracking(this, mpVocabulary, mpFrameDrawer, mpMapDrawer,
-                             mpAtlas, mpKeyFrameDatabase, strSettingsFile, mSensor, settings_, strSequence);
-
+                             mpAtlas, mpTraversability_, mpKeyFrameDatabase, strSettingsFile, mSensor, settings_, strSequence);
+#else
+    mpTracker = new Tracking(this, mpVocabulary, mpFrameDrawer, mpMapDrawer,
+                            mpAtlas, mpKeyFrameDatabase, strSettingsFile, mSensor, settings_, strSequence);
+#endif
     //Initialize the Local Mapping thread and launch
     mpLocalMapper = new LocalMapping(this, mpAtlas, mSensor==MONOCULAR || mSensor==IMU_MONOCULAR,
                                      mSensor==IMU_MONOCULAR || mSensor==IMU_STEREO || mSensor==IMU_RGBD, strSequence);
@@ -238,7 +244,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     // Fix verbosity
     Verbose::SetTh(Verbose::VERBOSITY_QUIET);
-    cout << "INIT COMPLETE" << endl;
+    cout << "INIT ORB COMPLETE" << endl;
 }
 
 Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp, const vector<IMU::Point>& vImuMeas, string filename)
@@ -1347,6 +1353,13 @@ LoopClosing* System::GetLoopClosing()
 {
     return mpLoopCloser;
 }
+
+#ifdef WITH_TRAVERSABILITY_MAP
+traversability_mapping::System* System::getTraversability()
+{
+    return mpTraversability_;
+}
+#endif
 
 double System::GetTimeFromIMUInit()
 {

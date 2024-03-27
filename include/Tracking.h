@@ -42,6 +42,10 @@
 #include <mutex>
 #include <unordered_set>
 
+#ifdef WITH_TRAVERSABILITY_MAP
+#include "traversability_mapping/System.hpp"
+#endif
+
 namespace ORB_SLAM3
 {
 
@@ -60,6 +64,11 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     Tracking(System* pSys, ORBVocabulary* pVoc, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Atlas* pAtlas,
              KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor, Settings* settings, const string &_nameSeq=std::string());
+
+#ifdef WITH_TRAVERSABILITY_MAP
+    Tracking(System* pSys, ORBVocabulary* pVoc, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Atlas* pAtlas, traversability_mapping::System* pTraversability,
+             KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor, Settings* settings, const string &_nameSeq=std::string());
+#endif
 
     ~Tracking();
 
@@ -264,7 +273,9 @@ protected:
     //BoW
     ORBVocabulary* mpORBVocabulary;
     KeyFrameDatabase* mpKeyFrameDB;
-
+#ifdef WITH_TRAVERSABILITY_MAP
+    traversability_mapping::System* mTraversability;
+#endif
     // Initalization (only for monocular)
     bool mbReadyToInitializate;
     bool mbSetInit;
