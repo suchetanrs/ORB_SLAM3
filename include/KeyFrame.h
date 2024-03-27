@@ -38,6 +38,9 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
 
+#ifdef WITH_TRAVERSABILITY_MAP
+#include "traversability_mapping/System.hpp"
+#endif
 
 namespace ORB_SLAM3
 {
@@ -196,6 +199,9 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     KeyFrame();
     KeyFrame(Frame &F, Map* pMap, KeyFrameDatabase* pKFDB);
+#ifdef WITH_TRAVERSABILITY_MAP
+    KeyFrame(Frame &F, Map* pMap, KeyFrameDatabase* pKFDB, traversability_mapping::System* pTraversabilitySystem);
+#endif
 
     // Pose functions
     void SetPose(const Sophus::SE3f &Tcw);
@@ -307,6 +313,9 @@ public:
 
     // The following variables are accesed from only 1 thread or never change (no mutex needed).
 public:
+    #ifdef WITH_TRAVERSABILITY_MAP
+    traversability_mapping::System* pTraversability_;
+    #endif
 
     static long unsigned int nNextId;
     long unsigned int mnId;

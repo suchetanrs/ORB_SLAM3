@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.3)
 project(ORB_SLAM3)
 
 IF(NOT CMAKE_BUILD_TYPE)
@@ -41,6 +41,16 @@ MESSAGE(${OpenCV_VERSION})
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(realsense2)
+
+find_package(traversability_mapping)
+if(traversability_mapping_FOUND)
+   find_package(PCL)
+    include_directories(${PROJECT_NAME}
+    ${traversability_mapping_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
+    )
+    ADD_DEFINITIONS("-DWITH_TRAVERSABILITY_MAP")
+endif(traversability_mapping_FOUND)
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
@@ -124,6 +134,14 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 -lboost_serialization
 -lcrypto
 )
+
+if(traversability_mapping_FOUND)
+   target_link_libraries(${PROJECT_NAME}
+   ${PCL_LIBRARIES}
+   type_conversion
+   traversabilitySystem
+   )
+endif(traversability_mapping_FOUND)
 
 # If RealSense SDK is found the library is added and its examples compiled
 if(realsense2_FOUND)
