@@ -151,7 +151,7 @@ KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB, traversability_
 
     std::cout << "Adding new keyframe with id: " << mnId << " and ts: " << mTimeStamp << std::endl;
 
-    // pTraversability_->addNewKeyFrame(mTimeStamp, mnId);
+    pTraversability_->addNewKeyFrame(mTimeStamp, mnId);
 }
 #endif
 
@@ -181,7 +181,7 @@ void KeyFrame::SetPose(const Sophus::SE3f &Tcw)
     }
     #ifdef WITH_TRAVERSABILITY_MAP
     std::cout << "Updating new keyframe: " << mnId << std::endl;
-    // pTraversability_->updateKeyFrame(mnId, mTcw);
+    pTraversability_->updateKeyFrame(mnId, mTcw);
     #endif
 }
 
