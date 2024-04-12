@@ -41,6 +41,17 @@ Map::Map(int initKFid):mnInitKFid(initKFid), mnMaxKFid(initKFid),/*mnLastLoopKFi
     mThumbnail = static_cast<GLubyte*>(NULL);
 }
 
+#ifdef WITH_TRAVERSABILITY_MAP
+Map::Map(int initKFid, traversability_mapping::System* pTraversabilitySystem):mnInitKFid(initKFid), mnMaxKFid(initKFid),/*mnLastLoopKFid(initKFid),*/ mnBigChangeIdx(0), mIsInUse(false),
+                       mHasTumbnail(false), mbBad(false), mbImuInitialized(false), mpFirstRegionKF(static_cast<KeyFrame*>(NULL)),
+                       mnMapChange(0), mbFail(false), mnMapChangeNotified(0), mbIsInertial(false), mbIMU_BA1(false), mbIMU_BA2(false), pTraversability_(pTraversabilitySystem)
+{
+    mnId=nNextId++;
+    mThumbnail = static_cast<GLubyte*>(NULL);
+    pTraversability_->addNewLocalMap(mnId);
+}
+#endif
+
 Map::~Map()
 {
     //TODO: erase all points from memory

@@ -28,7 +28,9 @@
 #include <mutex>
 
 #include <boost/serialization/base_object.hpp>
-
+#ifdef WITH_TRAVERSABILITY_MAP
+#include "traversability_mapping/System.hpp"
+#endif
 
 namespace ORB_SLAM3
 {
@@ -71,6 +73,9 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     Map();
     Map(int initKFid);
+#ifdef WITH_TRAVERSABILITY_MAP
+    Map(int initKFid, traversability_mapping::System* pTraversabilitySystem);
+#endif
     ~Map();
 
     void AddKeyFrame(KeyFrame* pKF);
@@ -168,6 +173,10 @@ protected:
 
     KeyFrame* mpKFinitial;
     KeyFrame* mpKFlowerID;
+
+    #ifdef WITH_TRAVERSABILITY_MAP
+    traversability_mapping::System* pTraversability_;
+    #endif
 
     unsigned long int mnBackupKFinitialID;
     unsigned long int mnBackupKFlowerID;

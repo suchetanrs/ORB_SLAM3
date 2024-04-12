@@ -30,7 +30,9 @@
 #include <mutex>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/export.hpp>
-
+#ifdef WITH_TRAVERSABILITY_MAP
+#include "traversability_mapping/System.hpp"
+#endif
 
 namespace ORB_SLAM3
 {
@@ -75,7 +77,9 @@ public:
     Atlas();
     Atlas(int initKFid); // When its initialization the first map is created
     ~Atlas();
-
+#ifdef WITH_TRAVERSABILITY_MAP
+    Atlas(int initKFid, traversability_mapping::System* pTraversabilitySystem);
+#endif
     void CreateNewMap();
     void ChangeMap(Map* pMap);
 
@@ -158,7 +162,9 @@ protected:
     // Class references for the map reconstruction from the save file
     KeyFrameDatabase* mpKeyFrameDB;
     ORBVocabulary* mpORBVocabulary;
-
+#ifdef WITH_TRAVERSABILITY_MAP
+    traversability_mapping::System* pTraversability_;
+#endif
     // Mutex
     std::mutex mMutexAtlas;
 

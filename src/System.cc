@@ -107,6 +107,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     mStrVocabularyFilePath = strVocFile;
 
+#ifdef WITH_TRAVERSABILITY_MAP
+    mpTraversability_ = new traversability_mapping::System();
+    cout << "INIT TRAVERSABILITY COMPLETE" << endl;
+#endif
+
     bool loadedAtlas = false;
 
     if(mStrLoadAtlasFromFile.empty())
@@ -129,7 +134,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
         //Create the Atlas
         cout << "Initialization of Atlas from scratch " << endl;
+#ifdef WITH_TRAVERSABILITY_MAP
+        mpAtlas = new Atlas(0, mpTraversability_);
+#else
         mpAtlas = new Atlas(0);
+#endif
     }
     else
     {
@@ -189,8 +198,6 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     //(it will live in the main thread of execution, the one that called this constructor)
     cout << "Seq. Name: " << strSequence << endl;
 #ifdef WITH_TRAVERSABILITY_MAP
-    mpTraversability_ = new traversability_mapping::System();
-    cout << "INIT TRAVERSABILITY COMPLETE" << endl;
     mpTracker = new Tracking(this, mpVocabulary, mpFrameDrawer, mpMapDrawer,
                              mpAtlas, mpTraversability_, mpKeyFrameDatabase, strSettingsFile, mSensor, settings_, strSequence);
 #else
@@ -216,7 +223,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     //Initialize the Loop Closing thread and launch
     // mSensor!=MONOCULAR && mSensor!=IMU_MONOCULAR
+#ifdef WITH_TRAVERSABILITY_MAP
+    mpLoopCloser = new LoopClosing(mpAtlas, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR, activeLC, mpTraversability_); // mSensor!=MONOCULAR);
+#else
     mpLoopCloser = new LoopClosing(mpAtlas, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR, activeLC); // mSensor!=MONOCULAR);
+#endif
     mptLoopClosing = new thread(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
 
     //Set pointers between threads

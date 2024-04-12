@@ -76,6 +76,52 @@ LoopClosing::LoopClosing(Atlas *pAtlas, KeyFrameDatabase *pDB, ORBVocabulary *pV
     mnCorrectionGBA = 0;
 }
 
+#ifdef WITH_TRAVERSABILITY_MAP
+LoopClosing::LoopClosing(Atlas *pAtlas, KeyFrameDatabase *pDB, ORBVocabulary *pVoc, const bool bFixScale, const bool bActiveLC, traversability_mapping::System* pTraversability):
+    mbResetRequested(false), mbResetActiveMapRequested(false), mbFinishRequested(false), mbFinished(true), mpAtlas(pAtlas), pTraversability_(pTraversability),
+    mpKeyFrameDB(pDB), mpORBVocabulary(pVoc), mpMatchedKF(NULL), mLastLoopKFid(0), mbRunningGBA(false), mbFinishedGBA(true),
+    mbStopGBA(false), mpThreadGBA(NULL), mbFixScale(bFixScale), mnFullBAIdx(0), mnLoopNumCoincidences(0), mnMergeNumCoincidences(0),
+    mbLoopDetected(false), mbMergeDetected(false), mnLoopNumNotFound(0), mnMergeNumNotFound(0), mbActiveLC(bActiveLC)
+{
+    mnCovisibilityConsistencyTh = 3;
+    mpLastCurrentKF = static_cast<KeyFrame*>(NULL);
+
+#ifdef REGISTER_TIMES
+
+    vdDataQuery_ms.clear();
+    vdEstSim3_ms.clear();
+    vdPRTotal_ms.clear();
+
+    vdMergeMaps_ms.clear();
+    vdWeldingBA_ms.clear();
+    vdMergeOptEss_ms.clear();
+    vdMergeTotal_ms.clear();
+    vnMergeKFs.clear();
+    vnMergeMPs.clear();
+    nMerges = 0;
+
+    vdLoopFusion_ms.clear();
+    vdLoopOptEss_ms.clear();
+    vdLoopTotal_ms.clear();
+    vnLoopKFs.clear();
+    nLoop = 0;
+
+    vdGBA_ms.clear();
+    vdUpdateMap_ms.clear();
+    vdFGBATotal_ms.clear();
+    vnGBAKFs.clear();
+    vnGBAMPs.clear();
+    nFGBA_exec = 0;
+    nFGBA_abort = 0;
+
+#endif
+
+    mstrFolderSubTraj = "SubTrajectories/";
+    mnNumCorrection = 0;
+    mnCorrectionGBA = 0;
+}
+#endif
+
 void LoopClosing::SetTracker(Tracking *pTracker)
 {
     mpTracker=pTracker;
@@ -190,6 +236,15 @@ void LoopClosing::Run()
 #endif
 
                         Verbose::PrintMess("Merge finished!", Verbose::VERBOSITY_QUIET);
+#ifdef WITH_TRAVERSABILITY_MAP
+                        for (auto map : mpAtlas->GetAllMaps())
+                        {
+                            for (auto kf : map->GetAllKeyFrames())
+                            {
+                                pTraversability_->updateKFMap(kf->mnId, map->GetId());
+                            }
+                        }
+#endif
                     }
 
                     vdPR_CurrentTime.push_back(mpCurrentKF->mTimeStamp);

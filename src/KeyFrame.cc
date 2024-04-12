@@ -93,7 +93,6 @@ KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB):
     SetPose(F.GetPose());
 
     mnOriginMapId = pMap->GetId();
-    std::cout << "Adding new keyframe without traversability id: " << mnId << std::endl;
 }
 
 #ifdef WITH_TRAVERSABILITY_MAP
@@ -148,10 +147,8 @@ KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB, traversability_
     SetPose(F.GetPose());
 
     mnOriginMapId = pMap->GetId();
-
-    std::cout << "Adding new keyframe with id: " << mnId << " and ts: " << mTimeStamp << std::endl;
-
-    pTraversability_->addNewKeyFrame(mTimeStamp, mnId);
+    // std::cout << "Adding new keyframe from map with id: " << mnId << " and ts: " << mTimeStamp << " and MAP! " << pMap->GetId() << std::endl;
+    pTraversability_->addNewKeyFrame(mTimeStamp, mnId, pMap->GetId());
 }
 #endif
 
@@ -180,7 +177,7 @@ void KeyFrame::SetPose(const Sophus::SE3f &Tcw)
         mOwb = mRwc * mImuCalib.mTcb.translation() + mTwc.translation();
     }
     #ifdef WITH_TRAVERSABILITY_MAP
-    std::cout << "Updating new keyframe: " << mnId << std::endl;
+    // std::cout << "Updating new keyframe: " << mnId << std::endl;
     pTraversability_->updateKeyFrame(mnId, mTcw);
     #endif
 }

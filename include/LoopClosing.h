@@ -54,6 +54,10 @@ public:
 
     LoopClosing(Atlas* pAtlas, KeyFrameDatabase* pDB, ORBVocabulary* pVoc,const bool bFixScale, const bool bActiveLC);
 
+#ifdef WITH_TRAVERSABILITY_MAP
+    LoopClosing(Atlas* pAtlas, KeyFrameDatabase* pDB, ORBVocabulary* pVoc,const bool bFixScale, const bool bActiveLC, traversability_mapping::System* pTraversability);
+#endif
+
     void SetTracker(Tracking* pTracker);
 
     void SetLocalMapper(LocalMapping* pLocalMapper);
@@ -85,6 +89,10 @@ public:
     bool mergeDetected();
 
     Viewer* mpViewer;
+
+#ifdef WITH_TRAVERSABILITY_MAP
+    traversability_mapping::System* pTraversability_;
+#endif
 
 #ifdef REGISTER_TIMES
 
