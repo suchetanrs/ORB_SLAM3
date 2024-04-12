@@ -35,6 +35,14 @@ Atlas::Atlas(int initKFid): mnLastInitKFidMap(initKFid), mHasViewer(false)
     mpCurrentMap = static_cast<Map*>(NULL);
     CreateNewMap();
 }
+#ifdef WITH_TRAVERSABILITY_MAP
+Atlas::Atlas(int initKFid, traversability_mapping::System* pTraversabilitySystem): mnLastInitKFidMap(initKFid), mHasViewer(false),
+                                                                                   pTraversability_(pTraversabilitySystem)
+{
+    mpCurrentMap = static_cast<Map*>(NULL);
+    CreateNewMap();
+}
+#endif
 
 Atlas::~Atlas()
 {
@@ -70,8 +78,11 @@ void Atlas::CreateNewMap()
         //    mpViewer->AddMapToCreateThumbnail(mpCurrentMap);
     }
     cout << "Creation of new map with last KF id: " << mnLastInitKFidMap << endl;
-
+#ifdef WITH_TRAVERSABILITY_MAP
+    mpCurrentMap = new Map(mnLastInitKFidMap, pTraversability_);
+#else
     mpCurrentMap = new Map(mnLastInitKFidMap);
+#endif
     mpCurrentMap->SetCurrentMap();
     mspMaps.insert(mpCurrentMap);
 }
