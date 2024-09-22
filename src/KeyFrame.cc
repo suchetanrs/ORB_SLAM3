@@ -143,12 +143,12 @@ KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB, traversability_
         mbHasVelocity = true;
     }
 
+    std::cout << "Adding new keyframe from map with id: " << mnId << " and ts: " << mTimeStamp << " and MAP! " << pMap->GetId() << std::endl;
+    pTraversability_->addNewKeyFrameTsDouble(mTimeStamp, mnId, pMap->GetId());
     mImuBias = F.mImuBias;
     SetPose(F.GetPose());
 
     mnOriginMapId = pMap->GetId();
-    std::cout << "Adding new keyframe from map with id: " << mnId << " and ts: " << mTimeStamp << " and MAP! " << pMap->GetId() << std::endl;
-    pTraversability_->addNewKeyFrameTsDouble(mTimeStamp, mnId, pMap->GetId());
 }
 #endif
 
