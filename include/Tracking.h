@@ -117,6 +117,10 @@ public:
 
     float GetImageScale();
 
+    void needExternalKF();
+
+    bool externalKFAdded();
+
 #ifdef REGISTER_LOOP
     void RequestStop();
     bool isStopped();
@@ -365,6 +369,10 @@ protected:
     int initID, lastID;
 
     Sophus::SE3f mTlr;
+
+    std::mutex externalKeyframeMutex_;
+    bool needExternalKFAddition_;
+    bool externalKFAdded_;
 
     void newParameterLoader(Settings* settings);
 
