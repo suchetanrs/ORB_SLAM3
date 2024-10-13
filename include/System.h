@@ -193,6 +193,11 @@ public:
 
     LoopClosing* GetLoopClosing();
 
+    Tracking* getTracking()
+    {
+        return mpTracker;
+    };
+
 #ifdef WITH_TRAVERSABILITY_MAP
     traversability_mapping::System* getTraversability();
 #endif

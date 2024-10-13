@@ -116,6 +116,8 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
             std::cout << " is unknown" << std::endl;
         }
     }
+    needExternalKFAddition_ = false;
+    externalKFAdded_ = false;
 
 #ifdef REGISTER_TIMES
     vdRectStereo_ms.clear();
@@ -184,6 +186,8 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
             }
         }
     }
+    needExternalKFAddition_ = false;
+    externalKFAdded_ = false;
 
     initID = 0; lastID = 0;
     mbInitWith3KFs = false;
@@ -3162,6 +3166,19 @@ bool Tracking::TrackLocalMap()
     }
 }
 
+void Tracking::needExternalKF()
+{
+    std::lock_guard<std::mutex> lock(externalKeyframeMutex_);
+    needExternalKFAddition_ = true;
+    externalKFAdded_ = false;
+};
+
+bool Tracking::externalKFAdded()
+{
+    std::lock_guard<std::mutex> lock(externalKeyframeMutex_);
+    return externalKFAdded_;
+};
+
 bool Tracking::NeedNewKeyFrame()
 {
     if((mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD) && !mpAtlas->GetCurrentMap()->isImuInitialized())
@@ -3284,8 +3301,14 @@ bool Tracking::NeedNewKeyFrame()
         c4=true;
     else
         c4=false;
+    bool c5 = false;
+    {
+        std::lock_guard<std::mutex> lock(externalKeyframeMutex_);
+        c5 = needExternalKFAddition_;
+    }
+    // std::cout << "External addition: " << c5 << std::endl;
 
-    if(((c1a||c1b||c1c) && c2)||c3 ||c4)
+    if(((c1a||c1b||c1c) && c2)||c3 ||c4||c5)
     {
         // If the mapping accepts keyframes, insert keyframe.
         // Otherwise send a signal to interrupt BA
@@ -3445,6 +3468,11 @@ void Tracking::CreateNewKeyFrame()
 
     mnLastKeyFrameId = mCurrentFrame.mnId;
     mpLastKeyFrame = pKF;
+    {
+        std::lock_guard<std::mutex> lock(externalKeyframeMutex_);
+        externalKFAdded_ = true;
+        needExternalKFAddition_ = false;
+    }
 }
 
 void Tracking::SearchLocalPoints()
