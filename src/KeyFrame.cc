@@ -737,6 +737,10 @@ void KeyFrame::SetBadFlag()
 
     mpMap->EraseKeyFrame(this);
     mpKeyFrameDB->erase(this);
+    #ifdef WITH_TRAVERSABILITY_MAP
+    // std::cout << "Updating new keyframe: " << mnId << std::endl;
+    pTraversability_->deleteKeyFrame(mnId);
+    #endif
 }
 
 bool KeyFrame::isBad()
