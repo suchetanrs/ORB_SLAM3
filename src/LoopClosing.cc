@@ -1053,6 +1053,9 @@ void LoopClosing::CorrectLoop()
         usleep(1000);
     }
 
+    #ifdef WITH_TRAVERSABILITY_MAP
+        pTraversability_->informLoopClosure();
+    #endif
     // Ensure current keyframe is updated
     //cout << "Start updating connections" << endl;
     //assert(mpCurrentKF->GetMap()->CheckEssentialGraph());
