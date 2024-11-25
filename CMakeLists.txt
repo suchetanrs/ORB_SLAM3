@@ -44,9 +44,11 @@ find_package(realsense2)
 
 find_package(traversability_mapping)
 if(traversability_mapping_FOUND)
+   find_package(PCL REQUIRED)
    # find_package(sensor_msgs)
     include_directories(${PROJECT_NAME}
     ${traversability_mapping_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
    #  ${sensor_msgs_INCLUDE_DIRS}
     )
     ADD_DEFINITIONS("-DWITH_TRAVERSABILITY_MAP")
@@ -137,7 +139,7 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 
 if(traversability_mapping_FOUND)
    target_link_libraries(${PROJECT_NAME}
-   # ${PCL_LIBRARIES}
+   ${PCL_LIBRARIES}
    # ${sensor_msgs_LIBRARIES}
    type_conversion
    traversabilitySystem
