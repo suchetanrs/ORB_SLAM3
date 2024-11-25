@@ -7,25 +7,25 @@ ENDIF()
 
 MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
+# set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
+# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 
-# Check C++14 or C++0x support
+# Check C++20 or C++0x support
 include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++20" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 if(COMPILER_SUPPORTS_CXX11)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
    add_definitions(-DCOMPILEDWITHC11)
-   message(STATUS "Using flag -std=c++14.")
+   message(STATUS "Using flag -std=c++20.")
 elseif(COMPILER_SUPPORTS_CXX0X)
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
    add_definitions(-DCOMPILEDWITHC0X)
    message(STATUS "Using flag -std=c++0x.")
 else()
-   message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Please use a different C++ compiler.")
+   message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++20 support. Please use a different C++ compiler.")
 endif()
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
@@ -44,9 +44,11 @@ find_package(realsense2)
 
 find_package(traversability_mapping)
 if(traversability_mapping_FOUND)
+   find_package(PCL REQUIRED)
    # find_package(sensor_msgs)
     include_directories(${PROJECT_NAME}
     ${traversability_mapping_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
    #  ${sensor_msgs_INCLUDE_DIRS}
     )
     ADD_DEFINITIONS("-DWITH_TRAVERSABILITY_MAP")
@@ -137,7 +139,7 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 
 if(traversability_mapping_FOUND)
    target_link_libraries(${PROJECT_NAME}
-   # ${PCL_LIBRARIES}
+   ${PCL_LIBRARIES}
    # ${sensor_msgs_LIBRARIES}
    type_conversion
    traversabilitySystem

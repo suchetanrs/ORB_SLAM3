@@ -178,7 +178,8 @@ void KeyFrame::SetPose(const Sophus::SE3f &Tcw)
     }
     #ifdef WITH_TRAVERSABILITY_MAP
     // std::cout << "Updating new keyframe: " << mnId << std::endl;
-    pTraversability_->updateKeyFrame(mnId, mTcw);
+    unique_lock<mutex> lockCon(mMutexConnections);
+    pTraversability_->updateKeyFrame(mnId, mTcw, mConnectedKeyFrameWeights.size());
     #endif
 }
 
