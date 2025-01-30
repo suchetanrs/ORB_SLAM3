@@ -2593,6 +2593,11 @@ bool LoopClosing::isFinished()
     return mbFinished;
 }
 
+bool LoopClosing::loopDetected()
+{
+    return mbLoopDetected;
+}
+
 bool LoopClosing::mergeDetected()
 {
     return mbMergeDetected;

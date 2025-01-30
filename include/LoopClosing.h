@@ -86,6 +86,8 @@ public:
 
     bool isFinished();
 
+    bool loopDetected();
+
     bool mergeDetected();
 
     Viewer* mpViewer;
