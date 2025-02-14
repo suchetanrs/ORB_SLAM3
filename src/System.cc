@@ -39,9 +39,9 @@ namespace ORB_SLAM3
 Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
 
 System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
-               const bool bUseViewer, const int initFr, const string &strSequence):
+               const bool bUseViewer, const bool bDoLoopClosing, const int initFr, const string &strSequence):
     mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false), mbResetActiveMap(false),
-    mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false)
+    mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false), mbLoopClosing(bDoLoopClosing)
 {
     // Output welcome message
     cout << endl <<
@@ -210,8 +210,18 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     //Initialize the Loop Closing thread and launch
     // mSensor!=MONOCULAR && mSensor!=IMU_MONOCULAR
-    mpLoopCloser = new LoopClosing(mpAtlas, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR, activeLC); // mSensor!=MONOCULAR);
-    mptLoopClosing = new thread(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
+    if(mbLoopClosing)
+    {
+        cout << "****Enabled Loop Closing****" << endl;
+        mpLoopCloser = new LoopClosing(mpAtlas, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR, activeLC); // mSensor!=MONOCULAR);
+        mptLoopClosing = new thread(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
+    }
+    else
+    {
+        cout << "****Disabled Loop Closing****" << endl;
+        mpLoopCloser = nullptr;
+        mptLoopClosing = nullptr;
+    }
 
     //Set pointers between threads
     mpTracker->SetLocalMapper(mpLocalMapper);
@@ -220,8 +230,10 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpLocalMapper->SetTracker(mpTracker);
     mpLocalMapper->SetLoopCloser(mpLoopCloser);
 
-    mpLoopCloser->SetTracker(mpTracker);
-    mpLoopCloser->SetLocalMapper(mpLocalMapper);
+    if(mpLoopCloser) {
+        mpLoopCloser->SetTracker(mpTracker);
+        mpLoopCloser->SetLocalMapper(mpLocalMapper);
+    }
 
     //usleep(10*1000*1000);
 
@@ -232,7 +244,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
         mpViewer = new Viewer(this, mpFrameDrawer,mpMapDrawer,mpTracker,strSettingsFile,settings_);
         mptViewer = new thread(&Viewer::Run, mpViewer);
         mpTracker->SetViewer(mpViewer);
-        mpLoopCloser->mpViewer = mpViewer;
+        if(mpLoopCloser) mpLoopCloser->mpViewer = mpViewer;
         mpViewer->both = mpFrameDrawer->both;
     }
 
@@ -522,7 +534,7 @@ void System::Shutdown()
     cout << "Shutdown" << endl;
 
     mpLocalMapper->RequestFinish();
-    mpLoopCloser->RequestFinish();
+    if (mpLoopCloser) mpLoopCloser->RequestFinish();
     if(mpViewer)
     {
         mpViewer->RequestFinish();
@@ -533,13 +545,13 @@ void System::Shutdown()
     }
 
     // Wait until all thread have effectively stopped
-    while(!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() || mpLoopCloser->isRunningGBA())
+    while(!mpLocalMapper->isFinished() || (mpLoopCloser && (!mpLoopCloser->isFinished() || mpLoopCloser->isRunningGBA())))
     {
         /*if(!mpLocalMapper->isFinished())
             cout << "mpLocalMapper is not finished" << endl;*/
-        /*if(!mpLoopCloser->isFinished())
+        /*if(mpLoopCloser && !mpLoopCloser->isFinished())
             cout << "mpLoopCloser is not finished" << endl;
-        if(mpLoopCloser->isRunningGBA()){
+        if(mpLoopCloser && mpLoopCloser->isRunningGBA()){
             cout << "mpLoopCloser is running GBA" << endl;
             cout << "break anyway..." << endl;
             break;

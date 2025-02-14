@@ -3795,11 +3795,13 @@ void Tracking::Reset(bool bLocMap)
         Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
     }
 
-
-    // Reset Loop Closing
-    Verbose::PrintMess("Reseting Loop Closing...", Verbose::VERBOSITY_NORMAL);
-    mpLoopClosing->RequestReset();
-    Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
+    if(mpLoopClosing) 
+    {
+        // Reset Loop Closing
+        Verbose::PrintMess("Reseting Loop Closing...", Verbose::VERBOSITY_NORMAL);
+        mpLoopClosing->RequestReset();
+        Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
+    }
 
     // Clear BoW Database
     Verbose::PrintMess("Reseting Database...", Verbose::VERBOSITY_NORMAL);
@@ -3856,10 +3858,12 @@ void Tracking::ResetActiveMap(bool bLocMap)
         Verbose::PrintMess("done", Verbose::VERBOSITY_VERY_VERBOSE);
     }
 
-    // Reset Loop Closing
-    Verbose::PrintMess("Reseting Loop Closing...", Verbose::VERBOSITY_NORMAL);
-    mpLoopClosing->RequestResetActiveMap(pMap);
-    Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
+    if(mpLoopClosing) {
+        // Reset Loop Closing
+        Verbose::PrintMess("Reseting Loop Closing...", Verbose::VERBOSITY_NORMAL);
+        mpLoopClosing->RequestResetActiveMap(pMap);
+        Verbose::PrintMess("done", Verbose::VERBOSITY_NORMAL);
+    }
 
     // Clear BoW Database
     Verbose::PrintMess("Reseting Database", Verbose::VERBOSITY_NORMAL);
