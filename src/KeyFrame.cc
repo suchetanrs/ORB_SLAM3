@@ -143,8 +143,11 @@ KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB, traversability_
         mbHasVelocity = true;
     }
 
-    std::cout << "Adding new keyframe from map with id: " << mnId << " and ts: " << mTimeStamp << " and MAP! " << pMap->GetId() << std::endl;
-    pTraversability_->addNewKeyFrameTsDouble(mTimeStamp, mnId, pMap->GetId());
+    if(pTraversability_)
+    {
+        std::cout << "Adding new keyframe from map with id: " << mnId << " and ts: " << mTimeStamp << " and MAP! " << pMap->GetId() << std::endl;
+        pTraversability_->addNewKeyFrameTsDouble(mTimeStamp, mnId, pMap->GetId());
+    }
     mImuBias = F.mImuBias;
     SetPose(F.GetPose());
 
@@ -179,7 +182,7 @@ void KeyFrame::SetPose(const Sophus::SE3f &Tcw)
     #ifdef WITH_TRAVERSABILITY_MAP
     // std::cout << "Updating new keyframe: " << mnId << std::endl;
     unique_lock<mutex> lockCon(mMutexConnections);
-    pTraversability_->updateKeyFrame(mnId, mTcw, mConnectedKeyFrameWeights.size());
+    if(pTraversability_) pTraversability_->updateKeyFrame(mnId, mTcw, mConnectedKeyFrameWeights.size());
     #endif
 }
 
@@ -740,7 +743,7 @@ void KeyFrame::SetBadFlag()
     mpKeyFrameDB->erase(this);
     #ifdef WITH_TRAVERSABILITY_MAP
     // std::cout << "Updating new keyframe: " << mnId << std::endl;
-    pTraversability_->deleteKeyFrame(mnId);
+    if(pTraversability_) pTraversability_->deleteKeyFrame(mnId);
     #endif
 }
 
