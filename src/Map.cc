@@ -48,7 +48,7 @@ Map::Map(int initKFid, traversability_mapping::System* pTraversabilitySystem):mn
 {
     mnId=nNextId++;
     mThumbnail = static_cast<GLubyte*>(NULL);
-    pTraversability_->addNewLocalMap(mnId);
+    if(pTraversability_) pTraversability_->addNewLocalMap(mnId);
 }
 #endif
 

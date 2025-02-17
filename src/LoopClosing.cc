@@ -241,7 +241,7 @@ void LoopClosing::Run()
                         {
                             for (auto kf : map->GetAllKeyFrames())
                             {
-                                pTraversability_->updateKFMap(kf->mnId, map->GetId());
+                                if(pTraversability_) pTraversability_->updateKFMap(kf->mnId, map->GetId());
                             }
                         }
 #endif
@@ -1054,7 +1054,7 @@ void LoopClosing::CorrectLoop()
     }
 
     #ifdef WITH_TRAVERSABILITY_MAP
-        pTraversability_->informLoopClosure();
+    if(pTraversability_) pTraversability_->informLoopClosure();
     #endif
     // Ensure current keyframe is updated
     //cout << "Start updating connections" << endl;

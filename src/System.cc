@@ -39,7 +39,7 @@ namespace ORB_SLAM3
 Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
 
 System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
-               const bool bUseViewer, const bool bDoLoopClosing, const int initFr, const string &strSequence):
+               const bool bUseViewer, const bool bDoLoopClosing, const bool useTraversability, const int initFr, const string &strSequence):
     mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false), mbResetActiveMap(false),
     mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false), mbLoopClosing(bDoLoopClosing)
 {
@@ -108,7 +108,16 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mStrVocabularyFilePath = strVocFile;
 
 #ifdef WITH_TRAVERSABILITY_MAP
-    mpTraversability_ = new traversability_mapping::System();
+    if(useTraversability)
+    {
+        cout << "USING TRAVERSABILITY" << endl;
+        mpTraversability_ = new traversability_mapping::System();
+    }
+    else
+    {
+        cout << "NOT USING TRAVERSABILITY" << endl;
+        mpTraversability_ = nullptr;
+    }
     cout << "INIT TRAVERSABILITY COMPLETE" << endl;
 #endif
 
