@@ -45,11 +45,13 @@ find_package(realsense2)
 find_package(traversability_mapping)
 if(traversability_mapping_FOUND)
    find_package(PCL REQUIRED)
+   find_package(grid_map_core REQUIRED)
    # find_package(sensor_msgs)
     include_directories(${PROJECT_NAME}
     ${traversability_mapping_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
-   #  ${sensor_msgs_INCLUDE_DIRS}
+    /opt/ros/humble/include/grid_map_core
+    #  ${sensor_msgs_INCLUDE_DIRS}
     )
     ADD_DEFINITIONS("-DWITH_TRAVERSABILITY_MAP")
 endif(traversability_mapping_FOUND)
