@@ -39,7 +39,7 @@ namespace ORB_SLAM3
 Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
 
 System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
-               const bool bUseViewer, const bool bDoLoopClosing, const bool useTraversability, const int initFr, const string &strSequence):
+               const bool bUseViewer, const bool bDoLoopClosing, const bool useTraversability, Eigen::Affine3f tf_SlamToLidar, Eigen::Affine3f tf_BaseToSlam, const int initFr, const string &strSequence):
     mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false), mbResetActiveMap(false),
     mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false), mbLoopClosing(bDoLoopClosing)
 {
@@ -112,6 +112,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     {
         cout << "USING TRAVERSABILITY" << endl;
         mpTraversability_ = new traversability_mapping::System();
+        mpTraversability_->setExtrinsicParameters(tf_SlamToLidar, tf_BaseToSlam);
     }
     else
     {
