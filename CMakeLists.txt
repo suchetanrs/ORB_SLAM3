@@ -46,6 +46,10 @@ find_package(traversability_mapping)
 if(traversability_mapping_FOUND)
    find_package(PCL REQUIRED)
    find_package(grid_map_core REQUIRED)
+   find_package(ament_cmake REQUIRED)
+   find_package(ament_index_cpp REQUIRED)
+   find_package(Sophus REQUIRED)
+   find_package(traversability_mapping_common REQUIRED)
    # find_package(sensor_msgs)
     include_directories(${PROJECT_NAME}
     ${traversability_mapping_INCLUDE_DIRS}
@@ -143,7 +147,9 @@ if(traversability_mapping_FOUND)
    target_link_libraries(${PROJECT_NAME}
    ${PCL_LIBRARIES}
    # ${sensor_msgs_LIBRARIES}
-   type_conversion
+   ament_index_cpp::ament_index_cpp
+   Sophus::Sophus
+   traversability_mapping_common
    traversabilitySystem
    )
 endif(traversability_mapping_FOUND)
