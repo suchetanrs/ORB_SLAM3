@@ -2037,6 +2037,7 @@ void Tracking::Track()
         {
             // Localization Mode: Local Mapping is deactivated (TODO Not available in inertial mode)
             if(mState==RECENTLY_LOST || mState==LOST)
+            // See issue https://github.com/UZ-SLAMLab/ORB_SLAM3/issues/515 for details about above fix
             {
                 if(mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD)
                     Verbose::PrintMess("IMU. State LOST", Verbose::VERBOSITY_NORMAL);
