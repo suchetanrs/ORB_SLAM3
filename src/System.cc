@@ -168,7 +168,10 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
         loadedAtlas = true;
 
-        mpAtlas->CreateNewMap();
+        // See issue https://github.com/UZ-SLAMLab/ORB_SLAM3/issues/515 for details.
+        // mpAtlas->CreateNewMap();
+        vector<Map*> map_vector = mpAtlas->GetAllMaps();
+        mpAtlas->ChangeMap(map_vector.at(0));
 
         //clock_t timeElapsed = clock() - start;
         //unsigned msElapsed = timeElapsed / (CLOCKS_PER_SEC / 1000);
