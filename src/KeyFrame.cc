@@ -26,6 +26,39 @@ namespace ORB_SLAM3
 
 long unsigned int KeyFrame::nNextId=0;
 
+#ifdef WITH_TRAVERSABILITY_MAP
+Eigen::Affine3f KeyFrame::msTf_BaseToSlam = Eigen::Affine3f::Identity();
+
+Eigen::Affine3f KeyFrame::TcwToMapBase(const Sophus::SE3f &Tcw)
+{
+    // Axis relabeling from ORB optical convention (x-right, y-down, z-forward) to the
+    // ROS body convention (x-forward, y-left, z-up). Same matrix the traversability
+    // library historically applied internally (se3ORBToROS).
+    Eigen::Matrix3f tfORBToROS;
+    tfORBToROS << 0, 0, 1,
+                 -1, 0, 0,
+                  0, -1, 0;
+
+    Eigen::Matrix3f Rcw = Tcw.rotationMatrix();
+    Eigen::Vector3f tcw = Tcw.translation();
+
+    // Relabel axes on the camera coords, invert (Tcw -> Twc), relabel on the map coords.
+    Eigen::Matrix3f Rtmp = tfORBToROS * Rcw;
+    Eigen::Vector3f ttmp = tfORBToROS * tcw;
+    Eigen::Matrix3f Rinv = Rtmp.transpose();
+    Eigen::Vector3f tinv = -(Rinv * ttmp);
+
+    // T_map_camlink (ROS): camera_link pose expressed in the map frame.
+    Eigen::Affine3f T_map_camlink = Eigen::Affine3f::Identity();
+    T_map_camlink.linear() = tfORBToROS * Rinv;
+    T_map_camlink.translation() = tfORBToROS * tinv;
+
+    // T_map_base = T_map_camlink * T_camlink_base, with T_camlink_base = (base<-camlink)^-1.
+    // msTf_BaseToSlam == tf_BaseToSlam == T_base_camlink.
+    return T_map_camlink * msTf_BaseToSlam.inverse();
+}
+#endif
+
 KeyFrame::KeyFrame():
         mnFrameId(0),  mTimeStamp(0), mnGridCols(FRAME_GRID_COLS), mnGridRows(FRAME_GRID_ROWS),
         mfGridElementWidthInv(0), mfGridElementHeightInv(0),
@@ -182,7 +215,9 @@ void KeyFrame::SetPose(const Sophus::SE3f &Tcw)
     #ifdef WITH_TRAVERSABILITY_MAP
     // std::cout << "Updating new keyframe: " << mnId << std::endl;
     unique_lock<mutex> lockCon(mMutexConnections);
-    if(pTraversability_) pTraversability_->updateKeyFrame(mnId, mTcw, mConnectedKeyFrameWeights.size());
+    // The traversability backend expects the map<-base pose in ROS coordinates, so convert
+    // the raw ORB Tcw (world->camera, optical axes) before handing it over.
+    if(pTraversability_) pTraversability_->updateKeyFrame(mnId, TcwToMapBase(mTcw), mConnectedKeyFrameWeights.size());
     #endif
 }
 

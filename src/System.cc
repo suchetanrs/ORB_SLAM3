@@ -113,6 +113,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
         cout << "USING TRAVERSABILITY" << endl;
         mpTraversability_ = new traversability_mapping::System();
         mpTraversability_->setExtrinsicParameters(tf_SlamToLidar, tf_BaseToSlam);
+        KeyFrame::msTf_BaseToSlam = tf_BaseToSlam;
     }
     else
     {

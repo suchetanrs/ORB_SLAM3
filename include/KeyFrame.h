@@ -315,6 +315,10 @@ public:
 public:
     #ifdef WITH_TRAVERSABILITY_MAP
     traversability_mapping::System* pTraversability_;
+
+    static Eigen::Affine3f msTf_BaseToSlam;
+    
+    static Eigen::Affine3f TcwToMapBase(const Sophus::SE3f &Tcw);
     #endif
 
     static long unsigned int nNextId;
